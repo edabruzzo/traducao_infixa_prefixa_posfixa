@@ -9,10 +9,17 @@ https://www.cos.ufrj.br/~rfarias/cos121/pilhas.html
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "arvoreTESTE.h"
+
 
  typedef struct no{
- char info;
- struct no *proximo;
+ 
+ 	union{
+    	char info;
+ 		Arvore* arvore;	
+	 };
+	struct no *proximo;
+ 
  } NO;
 
  typedef struct pilha{

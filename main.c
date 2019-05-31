@@ -1,6 +1,6 @@
 /*
 
-REFERÃŠNCIAS:
+REFERENCIAS:
 
 https://www.ime.usp.br/~pf/mac0122-2002/aulas/stacks.html
 https://www.cin.ufpe.br/~garme/public/(ebook)Estruturas%20de%20Dados%20Usando%20C%20(Tenenbaum).pdf
@@ -10,7 +10,7 @@ https://www.tutorialspoint.com/cprogramming/c_memory_management.htm
 https://www.ic.unicamp.br/~lehilton/mc202de/09-unidade-pilhaaplicacao.pdf
 https://www.ic.unicamp.br/~lehilton/mc202de/
 https://document.onl/documents/estrutura-de-dados-i-campus-de-santo-a-oberarquivosdisciplinasestruturaiisiapostila.html
-
+http://www.ic.uff.br/~ferraz/EDI/Ppt/P05ExpressoesAritmeticas1.ppt
 
 */
 
@@ -19,6 +19,7 @@ https://document.onl/documents/estrutura-de-dados-i-campus-de-santo-a-oberarquiv
 #include <string.h>
 #include <stdlib.h>
 #include "pilha.h"
+#include "arvore.h"
 
 #define TAMANHO_MAX 100
 
@@ -26,13 +27,16 @@ char expressao[TAMANHO_MAX];
 
 
 //Declaraçao de funcoes
-void convertePosfixa_Infixa(PILHA_DINAMICA *pilha, char expressao[]);
+void convertePosfixa_Infixa(char expressao[]);
 void convertePosfixa_Prefixa(PILHA_DINAMICA *pilha, char expressao[]);
 void convertePrefixa_Infixa(PILHA_DINAMICA *pilha, char expressao[]);
 void convertePrefixa_Posfixa(PILHA_DINAMICA *pilha, char expressao[]);
 void converteInfixa_Prefixa(PILHA_DINAMICA *pilha, char expressao[]);
 void converteInfixa_Posfixa(PILHA_DINAMICA *pilha, char expressao[]);
-int avaliaPrecedencia(PILHA_DINAMICA *pilha, char operador);
+int avaliaPrecedencia(char operador);
+int ehOperador(char c);
+int ehOperando(char c);
+void converteInfixaComArvoreBinaria(expressao[]);
 
 
 
@@ -73,13 +77,15 @@ int main(){
       
       recebeInput(); 
       //converteInfixa_Prefixa(expressao);
-      converteInfixa_Posfixa(pilha, expressao);
-      break;
+      //converteInfixa_Posfixa(pilha, expressao);
+      converteInfixaComArvoreBinaria(expressao); 
+	  	
+	  break;
 
       case(2):
    
-   	  recebeInput();   
-      convertePosfixa_Prefixa(pilha, expressao);
+   	  recebeInput();
+	  convertePosfixa_Prefixa(pilha, expressao);
       convertePosfixa_Infixa(pilha, expressao);
       break;
       
@@ -94,39 +100,34 @@ int main(){
 }
 
 
-void convertePosfixa_Infixa(PILHA_DINAMICA *pilha, char expressao[]){
-/*
-NESTA FUNÇÃO TEREI QUE LER A EXPRESSÃO PÓS-FIXA DA DIREITA PARA A ESQUERDA
-
-
-*/	
-
-	int i = strlen(expressao);
+void convertePosfixa_Infixa(char expressao[]){
 	
-	//operacao de leitura reversa da expressão pos-fixa
-	while(expressao[i--] != '/0'){
-		
-		if('a'<=expressao[i] && expressao[i] <='z' ){
-			push(pilha, expressao[i]);
-		}else {
+	
+    tipoResultado tipo;
+    
+	 struct elemento *pilha = NULL;
+    
+	if ((tipo = processarExpressaoPosfixa(&pilha)) == FIM)
+        if (pilha == NULL) printf("Expressao vazia\n");
+        else
+            if(pilha->prox == NULL)
+            {
+                converterRecursivamenteInfixa(pilha->no);
+                putchar('\n');
+            }
+            else printf("Expressao incompleta\n");
+    else
+         if (tipo == PILHA_VAZIA) printf("Expressao incompleta\n");
+        else printf("Simbolo invalido\n");
+    liberarPilha(&pilha); // liberar (sub)arvore(s) na pilha (lista ligada)		
 			
 			
-				
-				
-				
-			}
-			
-			
-			
-			
-		}		
-		
-		
-	}
-  
-  
-  
 }
+	
+  
+  
+  
+
 
 
 
@@ -162,7 +163,7 @@ void converteInfixa_Posfixa(PILHA_DINAMICA *pilha, char expressao[]){
  
    for (i=0; i<strlen(expressao); i++){
    	
-   	  if ('a' <= expressao[i] && expressao[i] <= 'z')
+   	  if (ehOperando(expressao[i]))
             printf("%c ", expressao[i]);
         else 
             switch (expressao[i]) {
@@ -194,8 +195,6 @@ void converteInfixa_Posfixa(PILHA_DINAMICA *pilha, char expressao[]){
   
   
   
- 
-      
     
 
 
@@ -227,9 +226,35 @@ int avaliaPrecedencia(char operador) {
         break;
 
     default:
-        printf(stderr, "Operador invalido!\n");
+        fprintf(stderr, "Operador invalido!\n");
         exit(1);
     }
-
-
+    
 }
+
+
+int ehOperador(char c){
+	
+	return(c=='+' || c=='-' || c=='*'|| c=='/');
+}
+
+
+int ehOperando(char c){
+	return ('a' <= c && c <= 'z');
+}
+
+
+
+void converteInfixaComArvoreBinaria(expressao[]){
+	
+	
+	Arvore *arvore = cria
+	
+		
+	
+	
+	
+	
+}
+
+
