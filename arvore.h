@@ -27,12 +27,11 @@ typedef struct arvoreBinaria{
 
 
 int vazia(Arvore *a);
-Arvore *inicializa();
 Arvore *criaArvore();
 void imprimeOrdemPrefixa(Arvore *arv);
 void imprimeOrdemPosFixa(Arvore *arv);
 void imprimeOrdemInfixa(Arvore *arv);
-Arvore *libera(Arvore *arv);
+Arvore *liberaArvore(Arvore *arv);
 
 
 
@@ -50,8 +49,6 @@ Arvore *criaArvore(){
 	return arv;
 
 }
-
-
 
 
 
@@ -96,12 +93,12 @@ void imprimeOrdemInfixa(Arvore *arv){
 
 
 
-Arvore *libera(Arvore *arv){
+Arvore *liberaArvore(Arvore *arv){
 	
 	if(!vazia(arv)){
 		
-		libera(arv->sae);//libera sub-árvore esquerda
-		libera(arv ->sad);//libera sub-árvore direita
+		liberaArvore(arv->sae);//libera sub-árvore esquerda
+		liberaArvore(arv ->sad);//libera sub-árvore direita
 		free(arv);
 		
 	}

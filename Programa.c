@@ -22,12 +22,23 @@ http://www.ic.uff.br/~ferraz/EDI/Ppt/P05ExpressoesAritmeticas1.ppt
 #include <string.h>
 #include <stdlib.h>
 #include "arvore.h"
+#include "pilha.h"
+
 # define TAMANHO_MAX 100
 
-Arvore * montaArvoreBinaria();
+
+Arvore* montaArvoreBinariaPrefixa();
+Arvore* montaArvoreBinariaInfixa();
+Arvore* montaArvoreBinariaPosfixa();
 char expressao[TAMANHO_MAX];
-void converterExpressaoAritmetica(char expressaoAvaliada[]);
+void converterExpressaoAritmetica(Arvore *arvore);
 void atribuirValorExpressaoGlobal(char expressaoAvaliada[]);
+Arvore* getProdutoDivisao(PILHA_DINAMICA *pilha);
+Arvore* getSomaSubtracao(PILHA_DINAMICA *pilha);
+Arvore* getOperando(PILHA_DINAMICA *pilha);
+
+
+
 int ehOperador(char c);
 int i;
 
@@ -53,18 +64,24 @@ char expressaoPOSFIXA[] = {'a', 'b', 'c', '*', 'd', 'e', '+', '*', '+', 'f', '*'
 
 int main(){
 	
-	converterExpressaoAritmetica(expressaoPREFIXA);	
-	converterExpressaoAritmetica(expressaoINFIXA);	
-	converterExpressaoAritmetica(expressaoPOSFIXA);	
+//	converterExpressaoAritmetica(expressaoPREFIXA);	
+//	converterExpressaoAritmetica(expressaoINFIXA);
+
+	atribuirValorExpressaoGlobal(expressaoPREFIXA);
+	Arvore *arvore = montaArvoreBinariaPrefixa();
+	converterExpressaoAritmetica(arvore);	
+	
+	
+	atribuirValorExpressaoGlobal(expressaoINFIXA);
+	arvore = montaArvoreBinariaInfixa();
+	converterExpressaoAritmetica(arvore);
 	
 	
 }
 
 
-void converterExpressaoAritmetica(char expressaoAvaliada[]){
+void converterExpressaoAritmetica(Arvore *arvore){
 	
-	atribuirValorExpressaoGlobal(expressaoAvaliada);
-	Arvore *arvore = montaArvoreBinaria();
 	printf("EXPRESSAO ARITMETICA EM ORDEM PREFIXA: ");
 	imprimeOrdemPrefixa(arvore);
 	printf("\n\n");
@@ -79,22 +96,138 @@ void converterExpressaoAritmetica(char expressaoAvaliada[]){
 }
 
 
-Arvore * montaArvoreBinaria(){
+Arvore* montaArvoreBinariaPrefixa(){
 	
 	char t;
-	Arvore *arvore = criaArvore(); 
+
 
 	t = expressao[i++];	
-    arvore->info = t;
+
+   	Arvore *arvore = criaArvore(); 
+
+   	arvore -> info = t;
     
     if (ehOperador(t)) {
-        arvore->sae = montaArvoreBinaria();
-        arvore->sad = montaArvoreBinaria();
+        arvore->sae = montaArvoreBinariaPrefixa();
+        arvore->sad = montaArvoreBinariaPrefixa();
     }else arvore->sae = arvore->sad = NULL;
 
 	return arvore;
 		
 }
+
+
+
+
+
+
+Arvore* getProdutoDivisao(PILHA_DINAMICA *pilha){
+
+	Arvore *a = getOperando(pilha);
+	char token = pilha -> topo -> info;
+	
+	if( token == '*' || token == '/'){
+		
+		Arvore* b = getOperando(pilha);
+		Arvore* x = criaArvore();
+		x -> info = token;
+		x -> sae = a;
+		x -> sad = b;
+		
+		return x;
+		
+	}
+	
+	return a;
+	
+}
+
+
+Arvore* getSomaSubtracao(PILHA_DINAMICA *pilha){
+	
+	
+	Arvore *a = getProdutoDivisao(pilha);
+	char token = pilha -> topo -> info;
+	
+	if(token == '+' || token =='-'){
+		
+		Arvore *b = getSomaSubtracao(pilha);
+		Arvore *x = criaArvore();
+			x -> info = token;
+		x -> sae = a;
+		x -> sad = b;
+		return x;
+	}
+		
+		return a;
+	
+}
+
+
+Arvore* getOperando(PILHA_DINAMICA *pilha){
+	
+	char token = pilha -> topo -> info;
+	char c;
+	Arvore* x = criaArvore();
+	
+	if(token == '('){
+		c = pop(pilha);
+		x = getSomaSubtracao(pilha);
+		if(token ==')') pop(pilha);
+		
+	}else{
+		pop(pilha);
+		x -> info = token;
+		
+	}
+	
+	return x;
+	
+	
+	
+}
+
+
+
+
+Arvore* montaArvoreBinariaInfixa(){
+	/*
+	Referência: 
+	https://aprendacompy.readthedocs.io/pt/latest/capitulo_20.html
+	ADAPTAÇÃO DE UMA IMPLEMENTAÇÃO EM PYTHON
+	
+	https://slideplayer.com.br/slide/3443767/
+	*/
+	
+	PILHA_DINAMICA * pilha = criaPilha();
+	
+	int i;
+	//MONTA A PILHA DA EXPRESSÃO EM ORDEM REVERSA
+	for(i=strlen(expressao); i<0; i++){
+		push(pilha, expressao[i]);
+	}
+	
+	
+	Arvore *arvore = getOperando(pilha);
+		
+	
+	return arvore;
+	
+	
+}
+
+
+
+
+
+
+
+int ehOperando(char c){
+	return ('a' <= c && c <= 'z');
+}
+
+
+
 
 
 int ehOperador(char c){
